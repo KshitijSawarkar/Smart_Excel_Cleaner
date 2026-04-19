@@ -19,19 +19,9 @@ A web application that automatically cleans messy Excel files by removing duplic
 - Backend: (Node.js / Python / Flask)
 - Libraries: Pandas / OpenPyXL
 
-📂 How to Run
-
-1. Clone the repository
-2. Install dependencies
-3. Run the server
-
 🎯 Use Case
 
 Saves hours of manual Excel cleaning for businesses, students, and analysts.
-
-📸 Screenshots
-
-(Add screenshots here)
 
 🔥 Future Improvements
 
