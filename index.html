@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Data Cleaner - Free Automated Data Cleaning Tool | Clean CSV & Excel Files</title>
+    <meta name="description" content="Free online data cleaning tool for CSV and Excel files. Remove duplicates, fill missing values, trim spaces, and standardize data. Secure local processing - your data never leaves your browser.">
+    <meta name="keywords" content="data cleaning, csv cleaner, excel cleaner, remove duplicates, fill missing values, data quality, data preprocessing, free data tool, secure data processing">
+    <meta name="author" content="Kshitij Sawarkar">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Smart Data Cleaner - Free Automated Data Cleaning Tool">
+    <meta property="og:description" content="Clean your CSV and Excel files online for free. Remove duplicates, fill missing values, and more. Your data stays secure on your device.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.com">
+    <meta property="og:image" content="https://your-domain.com/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Smart Data Cleaner - Free Data Cleaning Tool">
+    <meta name="twitter:description" content="Clean CSV and Excel files online. Remove duplicates, fill missing values, and more. Secure local processing.">
+    <meta name="twitter:image" content="https://your-domain.com/twitter-image.jpg">
+    <link rel="canonical" href="https://your-domain.com">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            transition: all 0.3s ease;
+        }
+        .upload-area.dragover {
+            border-color: #667eea;
+            background-color: #f7fafc;
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .issue-card {
+            transition: all 0.3s ease;
+        }
+        .issue-card:hover {
+            transform: translateX(5px);
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-broom text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Smart Data Cleaner</h1>
+                        <p class="text-purple-100 text-sm">Automated Data Cleaning & Analysis Tool</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <span class="text-sm"><i class="fas fa-shield-alt mr-1"></i> Secure & Private</span>
+                    <a href="privacy.html" class="text-white hover:text-purple-200 transition-colors text-sm">Privacy</a>
+                    <a href="terms.html" class="text-white hover:text-purple-200 transition-colors text-sm">Terms</a>
+                    <a href="contact.html" class="text-white hover:text-purple-200 transition-colors text-sm">Contact</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Top Ad Banner -->
+        <div class="mb-6 text-center">
+            <!-- AdSense Leaderboard Ad (728x90) -->
+            <div class="bg-gray-100 border border-gray-300 rounded-lg p-4 inline-block">
+                <p class="text-gray-500 text-sm">Advertisement Space (728x90)</p>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <section id="uploadSection" class="mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-upload mr-2 text-purple-600"></i>
+                    Upload Your Data File
+                </h2>
+                
+                <div id="uploadArea" class="upload-area rounded-lg p-12 text-center cursor-pointer hover:bg-gray-50">
+                    <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Drop your file here or click to browse</h3>
+                    <p class="text-gray-500 mb-4">Supported formats: CSV, Excel (.xlsx, .xls)</p>
+                    <p class="text-sm text-gray-400">Maximum file size: 50MB</p>
+                    <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" class="hidden">
+                </div>
+
+                <div id="fileInfo" class="hidden mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-file-alt text-green-600 text-xl"></i>
+                            <div>
+                                <p class="font-semibold text-green-800" id="fileName"></p>
+                                <p class="text-sm text-green-600" id="fileSize"></p>
+                            </div>
+                        </div>
+                        <button onclick="removeFile()" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-times-circle text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="uploadProgress" class="hidden mt-6">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="progress-bar bg-purple-600 h-2 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p class="text-center text-gray-600 mt-2">Processing your file...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Overview Section -->
+        <section id="overviewSection" class="hidden mb-8 fade-in">
+            <!-- Side Ad -->
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="md:col-span-3">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-chart-bar mr-2 text-purple-600"></i>
+                    Data Overview
+                </h2>
+                
+                <div class="grid md:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card text-white p-4 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-purple-100 text-sm">Total Rows</p>
+                                <p class="text-2xl font-bold" id="totalRows">0</p>
+                            </div>
+                            <i class="fas fa-table text-3xl text-purple-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-blue-500 text-white p-4 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Total Columns</p>
+                                <p class="text-2xl font-bold" id="totalColumns">0</p>
+                            </div>
+                            <i class="fas fa-columns text-3xl text-blue-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-500 text-white p-4 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-yellow-100 text-sm">Missing Values</p>
+                                <p class="text-2xl font-bold" id="totalMissing">0</p>
+                            </div>
+                            <i class="fas fa-question-circle text-3xl text-yellow-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-red-500 text-white p-4 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-red-100 text-sm">Duplicates</p>
+                                <p class="text-2xl font-bold" id="totalDuplicates">0</p>
+                            </div>
+                            <i class="fas fa-copy text-3xl text-red-200"></i>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <!-- Column Details Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="border border-gray-200 px-4 py-2 text-left text-sm font-semibold text-gray-700">Column Name</th>
+                                    <th class="border border-gray-200 px-4 py-2 text-left text-sm font-semibold text-gray-700">Data Type</th>
+                                    <th class="border border-gray-200 px-4 py-2 text-left text-sm font-semibold text-gray-700">Missing %</th>
+                                    <th class="border border-gray-200 px-4 py-2 text-left text-sm font-semibold text-gray-700">Unique Values</th>
+                                    <th class="border border-gray-200 px-4 py-2 text-left text-sm font-semibold text-gray-700">Issues</th>
+                                </tr>
+                            </thead>
+                            <tbody id="columnTableBody">
+                                <!-- Column details will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </div>
+                
+                <!-- Sidebar Ad -->
+                <div class="hidden md:block">
+                    <!-- AdSense Rectangle Ad (300x250) -->
+                    <div class="bg-gray-100 border border-gray-300 rounded-lg p-4 sticky top-4">
+                        <p class="text-gray-500 text-sm text-center">Advertisement Space (300x250)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Individual Cleaning Operations Section -->
+        <section id="individualCleaningSection" class="hidden mb-8 fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-magic mr-2 text-purple-600"></i>
+                    Individual Cleaning Operations
+                </h2>
+                
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <button onclick="removeDuplicatesManual()" class="bg-red-500 text-white py-3 px-4 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2">
+                        <i class="fas fa-copy"></i>
+                        <span>Remove Duplicates</span>
+                    </button>
+                    
+                    <button onclick="removeEmptyRows()" class="bg-orange-500 text-white py-3 px-4 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Remove Empty Rows</span>
+                    </button>
+                    
+                    <button onclick="trimExtraSpaces()" class="bg-yellow-500 text-white py-3 px-4 rounded-lg hover:bg-yellow-600 transition-colors flex items-center justify-center space-x-2">
+                        <i class="fas fa-compress-alt"></i>
+                        <span>Trim Extra Spaces</span>
+                    </button>
+                    
+                    <button onclick="showFillMissingDialog()" class="bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2">
+                        <i class="fas fa-fill"></i>
+                        <span>Fill Missing Values</span>
+                    </button>
+                    
+                    <button onclick="standardizeMissingValues()" class="bg-purple-500 text-white py-3 px-4 rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center space-x-2">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Standardize Missing Values</span>
+                    </button>
+                    
+                    <button onclick="downloadCSV()" class="bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-2">
+                        <i class="fas fa-file-csv"></i>
+                        <span>Convert to CSV</span>
+                    </button>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h3 class="font-semibold text-gray-800 mb-2">
+                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                        Operation Status
+                    </h3>
+                    <div id="operationStatus" class="text-sm text-gray-600">
+                        Click any button above to perform individual cleaning operations on your data.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mode Selection Section -->
+        <section id="modeSection" class="hidden mb-8 fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-cogs mr-2 text-purple-600"></i>
+                    Choose Cleaning Mode
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="border-2 border-purple-200 rounded-lg p-6 cursor-pointer hover:border-purple-400 transition-colors" onclick="selectMode('automatic')">
+                        <div class="text-center">
+                            <i class="fas fa-robot text-4xl text-purple-600 mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Automatic Mode</h3>
+                            <p class="text-gray-600 text-sm mb-4">Let AI analyze and fix all data issues automatically</p>
+                            <ul class="text-left text-sm text-gray-600 space-y-1">
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>Detect missing values</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>Remove duplicates</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>Handle outliers</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>Smart imputation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="border-2 border-blue-200 rounded-lg p-6 cursor-pointer hover:border-blue-400 transition-colors" onclick="selectMode('manual')">
+                        <div class="text-center">
+                            <i class="fas fa-hand-pointer text-4xl text-blue-600 mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Manual Mode</h3>
+                            <p class="text-gray-600 text-sm mb-4">Take full control with manual data operations</p>
+                            <ul class="text-left text-sm text-gray-600 space-y-1">
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>Sort data</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>Fill empty cells</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>Delete columns</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>Transform data</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Manual Operations Section -->
+        <section id="manualSection" class="hidden mb-8 fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-tools mr-2 text-blue-600"></i>
+                    Manual Data Operations
+                </h2>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Column Operations -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">
+                            <i class="fas fa-columns mr-2 text-blue-500"></i>Column Operations
+                        </h3>
+                        <div class="space-y-2">
+                            <select id="columnSelect" class="w-full p-2 border border-gray-300 rounded">
+                                <option value="">Select Column</option>
+                            </select>
+                            <button onclick="deleteColumn()" class="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors text-sm">
+                                <i class="fas fa-trash mr-1"></i>Delete Column
+                            </button>
+                            <button onclick="renameColumn()" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors text-sm">
+                                <i class="fas fa-edit mr-1"></i>Rename Column
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Operations -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">
+                            <i class="fas fa-database mr-2 text-green-500"></i>Data Operations
+                        </h3>
+                        <div class="space-y-2">
+                            <button onclick="showSortDialog()" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors text-sm">
+                                <i class="fas fa-sort mr-1"></i>Sort Data
+                            </button>
+                            <button onclick="showFillDialog()" class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors text-sm">
+                                <i class="fas fa-fill mr-1"></i>Fill Empty Cells
+                            </button>
+                            <button onclick="removeDuplicatesManual()" class="w-full bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition-colors text-sm">
+                                <i class="fas fa-copy mr-1"></i>Remove Duplicates
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Transform Operations -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">
+                            <i class="fas fa-magic mr-2 text-purple-500"></i>Transform
+                        </h3>
+                        <div class="space-y-2">
+                            <button onclick="showTransformDialog()" class="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition-colors text-sm">
+                                <i class="fas fa-exchange-alt mr-1"></i>Transform Data
+                            </button>
+                            <button onclick="filterData()" class="w-full bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 transition-colors text-sm">
+                                <i class="fas fa-filter mr-1"></i>Filter Rows
+                            </button>
+                            <button onclick="showAddColumnDialog()" class="w-full bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition-colors text-sm">
+                                <i class="fas fa-plus mr-1"></i>Add Column
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Operation History -->
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-history mr-2 text-gray-500"></i>Operation History
+                    </h3>
+                    <div id="operationHistory" class="space-y-1 max-h-32 overflow-y-auto">
+                        <p class="text-sm text-gray-500">No operations performed yet</p>
+                    </div>
+                    <div class="mt-3 flex space-x-2">
+                        <button onclick="undoLastOperation()" class="bg-gray-500 text-white py-1 px-3 rounded hover:bg-gray-600 transition-colors text-sm">
+                            <i class="fas fa-undo mr-1"></i>Undo
+                        </button>
+                        <button onclick="clearHistory()" class="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition-colors text-sm">
+                            <i class="fas fa-trash mr-1"></i>Clear History
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Issues Dashboard Section -->
+        <section id="issuesSection" class="hidden mb-8 fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-exclamation-triangle mr-2 text-yellow-500"></i>
+                    Data Quality Issues & Recommendations
+                </h2>
+                
+                <div id="issuesContainer" class="space-y-4">
+                    <!-- Issues will be dynamically inserted here -->
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="startCleaning()" 
+                            class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg">
+                        <i class="fas fa-magic mr-2"></i>
+                        Start Automated Cleaning
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cleaning Progress Section -->
+        <section id="cleaningSection" class="hidden mb-8 fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-cogs mr-2 text-purple-600"></i>
+                    Cleaning Your Data
+                </h2>
+                
+                <div id="cleaningProgress" class="space-y-4">
+                    <!-- Cleaning steps will be shown here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultsSection" class="hidden mb-8 fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-check-circle mr-2 text-green-500"></i>
+                    Cleaning Complete! Here Are Your Results
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-green-800 mb-4">
+                            <i class="fas fa-trophy mr-2"></i>
+                            Cleaning Statistics
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Missing Values Fixed:</span>
+                                <span class="font-semibold text-green-600" id="missingFixed">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Duplicates Removed:</span>
+                                <span class="font-semibold text-green-600" id="duplicatesRemoved">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Outliers Handled:</span>
+                                <span class="font-semibold text-green-600" id="outliersHandled">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Data Quality Score:</span>
+                                <span class="font-semibold text-green-600" id="qualityScore">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-blue-800 mb-4">
+                            <i class="fas fa-file-download mr-2"></i>
+                            Download Cleaned Data
+                        </h3>
+                        <div class="space-y-3">
+                            <button onclick="downloadCSV()" 
+                                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-download mr-2"></i>
+                                Download as CSV
+                            </button>
+                            <button onclick="downloadExcel()" 
+                                    class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fas fa-file-excel mr-2"></i>
+                                Download as Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview of Cleaned Data -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-eye mr-2"></i>
+                        Preview of Cleaned Data
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse" id="previewTable">
+                            <!-- Preview data will be inserted here -->
+                        </table>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button onclick="resetApp()" 
+                            class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-redo mr-2"></i>
+                        Clean Another File
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Ad Banner -->
+        <div class="mb-8 text-center">
+            <!-- AdSense Leaderboard Ad (728x90) -->
+            <div class="bg-gray-100 border border-gray-300 rounded-lg p-4 inline-block">
+                <p class="text-gray-500 text-sm">Advertisement Space (728x90)</p>
+            </div>
+        </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400 mb-4">
+                <i class="fas fa-lock mr-1"></i>
+                All data processing happens locally in your browser. Your data never leaves your device.
+            </p>
+            <p class="text-white font-semibold mt-4">
+                <i class="fas fa-user mr-2"></i>
+                Designed By Kshitij Sawarkar
+            </p>
+            <p class="text-center mt-3">
+                <a href="https://linkedin.com/in/kshitijas" target="_blank" class="text-blue-400 hover:text-blue-300 transition-colors inline-flex items-center space-x-2">
+                    <i class="fab fa-linkedin text-lg"></i>
+                    <span>Connect on LinkedIn</span>
+                </a>
+            </p>
+            <div class="mt-4 text-sm text-gray-400">
+                <a href="index.html" class="hover:text-white transition-colors">Home</a> |
+                <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a> |
+                <a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a> |
+                <a href="contact.html" class="hover:text-white transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+<script>
+// Debug function to test button clicks
+window.testButtons = function() {
+    console.log('Testing button functions...');
+    console.log('removeDuplicatesManual exists:', typeof removeDuplicatesManual);
+    console.log('removeEmptyRows exists:', typeof removeEmptyRows);
+    console.log('trimExtraSpaces exists:', typeof trimExtraSpaces);
+    console.log('standardizeColumnNames exists:', typeof standardizeColumnNames);
+    console.log('fillMissingValuesFromDashboard exists:', typeof fillMissingValuesFromDashboard);
+    console.log('updateDashboardStatus exists:', typeof updateDashboardStatus);
+};
+
+// Test on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded, checking functions...');
+    window.testButtons();
+});
+</script>
+</body>
+</html>
